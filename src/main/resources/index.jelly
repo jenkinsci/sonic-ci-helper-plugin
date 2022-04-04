@@ -1,4 +1,5 @@
 <?jelly escape-by-default='true'?>
 <div>
-    TODO
+    1. This plug-in upload the apk/ipa file to sonic
+    2. This plug-in notify sonic apk/ipa build over
 </div>
