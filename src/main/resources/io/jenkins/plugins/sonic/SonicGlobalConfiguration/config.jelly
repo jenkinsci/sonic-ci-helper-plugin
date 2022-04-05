@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:section title="Sonic Configuration">
+        <f:entry title="host" field="host">
+
+            <f:textbox default="http://localhost:9994"/>
+        </f:entry>
+
+        <f:entry title="token" field="apiKey">
+            <f:password/>
+        </f:entry>
+    </f:section>
+</j:jelly>

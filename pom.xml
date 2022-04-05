@@ -21,7 +21,7 @@
           ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
      -->
     </properties>
-    <name>TODO Plugin</name>
+    <name>Upload for sonic</name>
     <!-- The default licence for Jenkins OSS Plugins is MIT. Substitute for the applicable one if needed. -->
     <licenses>
         <license>
@@ -34,6 +34,10 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>structs</artifactId>
             <version>1.19</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ejlchina</groupId>
+            <artifactId>okhttps-gson</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -92,6 +96,12 @@
                 <version>2.2.6</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>com.ejlchina</groupId>
+                <artifactId>okhttps-gson</artifactId>
+                <version>3.4.4</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
