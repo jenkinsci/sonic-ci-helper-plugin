@@ -5,11 +5,7 @@ import hudson.ExtensionList;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
-import jenkins.model.GlobalConfigurationCategory;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -42,6 +38,12 @@ public class SonicGlobalConfiguration extends GlobalConfiguration {
 
     public Secret getApiKey() {
         return apiKey;
+    }
+
+    public static String planApiKey(Secret apiKey){
+        String globalApiKey = Secret.toString(SonicGlobalConfiguration.get().getApiKey());
+        String currentApiKey = Secret.toString(apiKey);
+        return StringUtils.isBlank(currentApiKey) ? globalApiKey: currentApiKey;
     }
 
     /** @return the singleton instance */
