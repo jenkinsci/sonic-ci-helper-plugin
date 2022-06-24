@@ -10,6 +10,10 @@
         <f:textbox/>
     </f:entry>
 
+    <f:entry title="project" field="projectId">
+         <f:select/>
+    </f:entry>
+
     <f:entry title="token(optional)" field="apiKey">
         <f:password/>
     </f:entry>

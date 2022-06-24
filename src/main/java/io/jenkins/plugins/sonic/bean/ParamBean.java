@@ -7,6 +7,7 @@ public class ParamBean {
     private String wildcard ;
     private String updateDescription;
     private String qrcodePath;
+    private String projectId;
 
     public ParamBean(){}
 
@@ -56,5 +57,13 @@ public class ParamBean {
 
     public void setQrcodePath(String qrcodePath) {
         this.qrcodePath = qrcodePath;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getProjectId() {
+        return projectId;
     }
 }
