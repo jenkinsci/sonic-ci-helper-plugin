@@ -1,8 +1,10 @@
 package io.jenkins.plugins.sonic.bean;
 
+import hudson.util.Secret;
+
 public class ParamBean {
     private String host;
-    private String apiKey;
+    private Secret apiKey;
     private String scanDir;
     private String wildcard ;
     private String updateDescription;
@@ -19,11 +21,11 @@ public class ParamBean {
         this.host = host;
     }
 
-    public String getApiKey() {
+    public Secret getApiKey() {
         return apiKey;
     }
 
-    public void setApiKey(String apiKey) {
+    public void setApiKey(Secret apiKey) {
         this.apiKey = apiKey;
     }
 

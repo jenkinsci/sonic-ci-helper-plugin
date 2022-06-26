@@ -7,8 +7,7 @@ import org.apache.commons.lang.StringUtils;
 class ValidationParameters {
 
     public static FormValidation doCheckApiKey(String value) {
-        String globalApiKey = Secret.toString(SonicGlobalConfiguration.get().getApiKey());
-        if (StringUtils.isEmpty(globalApiKey ) &&
+        if (StringUtils.isEmpty(value) &&
                 value.length() == 0) {
             return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missApiKey());
         }

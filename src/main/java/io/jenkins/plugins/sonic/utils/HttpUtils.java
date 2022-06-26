@@ -128,7 +128,7 @@ public class HttpUtils {
         packageBean.setBranch(branch);
 
         com.ejlchina.okhttps.HttpResult result = http.sync(paramBean.getHost() + PACKAGE_URL)
-                .addHeader(SonicToken, paramBean.getApiKey())
+                .addHeader(SonicToken, String.valueOf(paramBean.getApiKey()))
                 .setBodyPara(packageBean)
                 .put();
 
@@ -155,7 +155,7 @@ public class HttpUtils {
 
     private static AHttpTask buildHttp(ParamBean paramBean, String uri) {
         return http.async(paramBean.getHost() + uri)
-                .addHeader(SonicToken, paramBean.getApiKey());
+                .addHeader(SonicToken, String.valueOf(paramBean.getApiKey()));
     }
 
     public static HttpResult<List<Project>> listProject(String apiKey) {
