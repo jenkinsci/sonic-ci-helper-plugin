@@ -1,5 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    1. This plug-in upload the apk/ipa file to sonic
-    2. This plug-in notify sonic apk/ipa build over
+    This plugin help your CI/CD with Sonic Testing Platform.
 </div>

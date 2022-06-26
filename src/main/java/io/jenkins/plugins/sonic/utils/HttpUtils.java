@@ -23,9 +23,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class HttpUtils {
-    private static final String UPLOAD_URL = "/api/folder/upload";
-    private static final String PROJECT_URL = "/api/controller/projects/list";
-    private static final String PACKAGE_URL = "/api/controller/packages";
+    private static final String UPLOAD_URL = "/server/api/folder/upload";
+    private static final String PROJECT_URL = "/server/api/controller/projects/list";
+    private static final String PACKAGE_URL = "/server/api/controller/packages";
     private static final String SonicToken = "SonicToken";
     private static final String BRANCH = "${GIT_BRANCH}";
     private static final HTTP http = HTTP.builder()
@@ -37,7 +37,7 @@ public class HttpUtils {
     public static boolean upload(AbstractBuild<?, ?> build, BuildListener listener, ParamBean paramBean) throws IOException, InterruptedException {
 
         paramBean.setHost(build.getEnvironment(listener).expand(paramBean.getHost()));
-        paramBean.setApiKey(build.getEnvironment(listener).expand(paramBean.getApiKey()));
+        paramBean.setApiKey(Secret.fromString(build.getEnvironment(listener).expand(Secret.toString(paramBean.getApiKey()))));
         paramBean.setWildcard(build.getEnvironment(listener).expand(paramBean.getWildcard()));
         paramBean.setScanDir(build.getEnvironment(listener).expand(paramBean.getScanDir()));
         paramBean.setUpdateDescription(build.getEnvironment(listener).expand(paramBean.getUpdateDescription()));
@@ -84,18 +84,10 @@ public class HttpUtils {
                 .addFilePara("file", uploadFile)
                 .addBodyPara("type", "packageFiles")
                 .stepRate(0.05)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）
-                .setOnProcess(new OnCallback<Process>() {
-                    @Override
-                    public void on(Process process) {
-                        Logging.logging(listener, "upload progress: " + (int)(process.getRate() * 100) + " %");
-                    }
-                })
-                .setOnException(new OnCallback<IOException>() {
-                    @Override
-                    public void on(IOException e) {
-                        Logging.logging(listener, "upload exception: " );
-                        Logging.logging(listener, e.fillInStackTrace().toString());
-                    }
+                .setOnProcess(process -> Logging.logging(listener, "upload progress: " + (int)(process.getRate() * 100) + " %"))
+                .setOnException(e -> {
+                    Logging.logging(listener, "upload exception: " );
+                    Logging.logging(listener, e.fillInStackTrace().toString());
                 })
                 .post();
         if (call.getResult().isSuccessful()) {
@@ -128,7 +120,7 @@ public class HttpUtils {
         packageBean.setBranch(branch);
 
         com.ejlchina.okhttps.HttpResult result = http.sync(paramBean.getHost() + PACKAGE_URL)
-                .addHeader(SonicToken, String.valueOf(paramBean.getApiKey()))
+                .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()))
                 .setBodyPara(packageBean)
                 .put();
 
@@ -155,16 +147,17 @@ public class HttpUtils {
 
     private static AHttpTask buildHttp(ParamBean paramBean, String uri) {
         return http.async(paramBean.getHost() + uri)
-                .addHeader(SonicToken, String.valueOf(paramBean.getApiKey()));
+                .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()));
     }
 
     public static HttpResult<List<Project>> listProject(String apiKey) {
-        String currentApiKey = SonicGlobalConfiguration.planApiKey(Secret.fromString(apiKey));
+        //debug
+        String currentApiKey = "";
         String host = SonicGlobalConfiguration.get().getHost();
 
-        if (currentApiKey == null || host == null) {
-            throw new AssertionError("api key or host is null");
-        }
+//        if (currentApiKey == null || host == null) {
+//            throw new AssertionError("api key or host is null");
+//        }
         return http.sync(host + PROJECT_URL)
                 .addHeader(SonicToken, currentApiKey)
                 .get()
@@ -202,14 +195,10 @@ public class HttpUtils {
         }
 
         List<String> strings = Arrays.asList(uploadFiles);
-        Collections.sort(strings, new Comparator<String>() {
-
-            @Override
-            public int compare(String o1, String o2) {
-                File file1 = new File(dir, o1);
-                File file2 = new File(dir, o2);
-                return Long.compare(file2.lastModified(), file1.lastModified());
-            }
+        Collections.sort(strings, (o1, o2) -> {
+            File file1 = new File(dir, o1);
+            File file2 = new File(dir, o2);
+            return Long.compare(file2.lastModified(), file1.lastModified());
         });
         String uploadFiltPath = new File(dir, strings.get(0)).getAbsolutePath();
         Logging.logging(listener, "Found " + uploadFiles.length + " files, the default choice of the latest modified file!");

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-    <f:section title="Sonic Configuration">
-        <f:entry title="Sonic Server Host" field="host">
+    <f:section title="${%Title}">
+        <f:entry title="${%Host}" field="host">
 
-            <f:textbox default="http://192.168.1.1:3000/server"/>
+            <f:textbox default="http://192.168.1.1:3000"/>
         </f:entry>
 
 <!--        <f:entry title="Sonic Auth Token" field="apiKey">-->

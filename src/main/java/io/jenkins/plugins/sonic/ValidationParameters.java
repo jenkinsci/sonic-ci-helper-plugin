@@ -1,7 +1,6 @@
 package io.jenkins.plugins.sonic;
 
 import hudson.util.FormValidation;
-import hudson.util.Secret;
 import org.apache.commons.lang.StringUtils;
 
 class ValidationParameters {
