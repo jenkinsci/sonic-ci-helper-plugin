@@ -136,6 +136,7 @@ public class UploadBuilder extends Builder {
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, e.getMessage(), e);
+                throw new AssertionError(Messages._UploadBuilder_Http_error_fail());
             }
             return items;
         }

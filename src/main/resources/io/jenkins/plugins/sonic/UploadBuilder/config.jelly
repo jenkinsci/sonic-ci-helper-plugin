@@ -2,28 +2,20 @@
 <j:jelly xmlns:j="jelly:core"
          xmlns:f="/lib/form">
 
-    <f:entry title="scandir" field="scanDir">
+    <f:entry title="${%scanTitle}" field="scanDir">
         <f:textbox default="$${WORKSPACE}"/>
     </f:entry>
 
-    <f:entry title="project" field="projectId">
+    <f:entry title="${%projectTitle}" field="projectId">
          <f:select/>
     </f:entry>
 
-    <f:entry title="token" field="apiKey">
+    <f:entry title="${%tokenTitle}" field="apiKey">
         <f:password/>
     </f:entry>
 
     <f:advanced>
-<!--        <f:entry title="updateDescription(optional)" field="updateDescription">-->
-<!--            <f: default="Uploaded by jenkins upload-sonic plugin"/>-->
-<!--        </f:entry>-->
-
-        <f:entry title="updateDescription(optional)" field="updateDescription">
-            <f:textarea default="Uploaded by Sonic CI Helper"/>
-        </f:entry>
-
-        <f:entry title="qrcodePath(optional)" field="qrcodePath">
+        <f:entry title="${%suiteTitle}" field="suiteId">
             <f:textbox/>
         </f:entry>
 
