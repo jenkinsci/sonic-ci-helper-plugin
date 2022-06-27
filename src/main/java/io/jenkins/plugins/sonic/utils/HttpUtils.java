@@ -24,10 +24,13 @@ import java.util.List;
 
 public class HttpUtils {
     private static final String UPLOAD_URL = "/server/api/folder/upload";
-    private static final String PROJECT_URL = "/server/api/controller/projects/list";
+    private static final String PROJECT_URL = "/api/controller/projects/list";
     private static final String PACKAGE_URL = "/server/api/controller/packages";
     private static final String SonicToken = "SonicToken";
     private static final String BRANCH = "${GIT_BRANCH}";
+    private static final String BUILD_NUMBER = "${BUILD_NUMBER}";
+    private static final String JOB_NAME  = "${JOB_NAME}";
+    private static final String BUILD_URL  = "${BUILD_URL}";
     private static final HTTP http = HTTP.builder()
             .bodyType("json")
             .addMsgConvertor(new GsonMsgConvertor())
@@ -38,17 +41,14 @@ public class HttpUtils {
 
         paramBean.setHost(build.getEnvironment(listener).expand(paramBean.getHost()));
         paramBean.setApiKey(Secret.fromString(build.getEnvironment(listener).expand(Secret.toString(paramBean.getApiKey()))));
-        paramBean.setWildcard(build.getEnvironment(listener).expand(paramBean.getWildcard()));
         paramBean.setScanDir(build.getEnvironment(listener).expand(paramBean.getScanDir()));
-        paramBean.setUpdateDescription(build.getEnvironment(listener).expand(paramBean.getUpdateDescription()));
-        paramBean.setQrcodePath(build.getEnvironment(listener).expand(paramBean.getQrcodePath()));
 
         if (!StringUtils.hasText(paramBean.getProjectId())) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missProjectId());
             return false;
         }
 
-        String path = findFile(paramBean.getScanDir(), paramBean.getWildcard(), listener);
+        String path = findFile(paramBean.getScanDir(), listener);
         if (!StringUtils.hasText(path)) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missFile());
             return false;
@@ -150,16 +150,13 @@ public class HttpUtils {
                 .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()));
     }
 
-    public static HttpResult<List<Project>> listProject(String apiKey) {
-        //debug
-        String currentApiKey = "";
+    public static HttpResult<List<Project>> listProject() {
         String host = SonicGlobalConfiguration.get().getHost();
 
-//        if (currentApiKey == null || host == null) {
-//            throw new AssertionError("api key or host is null");
-//        }
+        if (host == null) {
+            throw new AssertionError("Sonic Url is null! Please set it in GlobalConfiguration.");
+        }
         return http.sync(host + PROJECT_URL)
-                .addHeader(SonicToken, currentApiKey)
                 .get()
                 .getBody()
                 .toBean(new TypeRef<HttpResult<List<Project>>>() {
@@ -172,7 +169,7 @@ public class HttpUtils {
     }
 
 
-    public static String findFile(String scandir, String wildcard,BuildListener listener ) {
+    public static String findFile(String scandir,BuildListener listener ) {
         File dir = new File(scandir);
         if (!dir.exists() || !dir.isDirectory()) {
             Logging.logging(listener, "scan dir:" + dir.getAbsolutePath());
@@ -182,7 +179,7 @@ public class HttpUtils {
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(scandir);
-        scanner.setIncludes(new String[]{wildcard});
+        scanner.setIncludes(new String[]{"ipa","apk"});
         scanner.setCaseSensitive(true);
         scanner.scan();
         String[] uploadFiles = scanner.getIncludedFiles();

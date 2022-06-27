@@ -13,16 +13,17 @@ class ValidationParameters {
         return FormValidation.ok();
     }
 
-    public static FormValidation doCheckScanDir(String value) {
-        if (value.length() == 0) {
-            return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missScanDir());
+    public static FormValidation doCheckProjectId(Integer value) {
+        if (value == null ||
+                value == 0) {
+            return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missProjectId());
         }
         return FormValidation.ok();
     }
 
-    public static FormValidation doCheckWildcard(String value) {
+    public static FormValidation doCheckScanDir(String value) {
         if (value.length() == 0) {
-            return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missWildcard());
+            return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missScanDir());
         }
         return FormValidation.ok();
     }

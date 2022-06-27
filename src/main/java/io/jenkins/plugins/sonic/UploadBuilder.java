@@ -49,25 +49,23 @@ public class UploadBuilder extends Builder {
     private static final Logger LOGGER = Logger.getLogger(UploadBuilder.class.getName());
     private final Secret apiKey;
     private final String scanDir;
-    private final String wildcard;
-    private final String updateDescription;
-
-    private final String qrcodePath;
-
+    private String suiteId;
     private String projectId;
 
     @DataBoundConstructor
-    public UploadBuilder(String apiKey, String scanDir, String wildcard,String updateDescription, String qrcodePath) {
+    public UploadBuilder(String apiKey, String scanDir) {
         this.apiKey = Secret.fromString(apiKey);
         this.scanDir = scanDir;
-        this.wildcard = wildcard;
-        this.updateDescription = updateDescription;
-        this.qrcodePath = qrcodePath;
     }
 
     @DataBoundSetter
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    @DataBoundSetter
+    public void setSuiteId(String suiteId) {
+        this.suiteId = suiteId;
     }
 
     public Secret getApiKey() {
@@ -78,16 +76,8 @@ public class UploadBuilder extends Builder {
         return scanDir;
     }
 
-    public String getWildcard() {
-        return wildcard;
-    }
-
-    public String getUpdateDescription() {
-        return updateDescription;
-    }
-
-    public String getQrcodePath() {
-        return qrcodePath;
+    public String getSuiteId() {
+        return suiteId;
     }
 
     public String getProjectId() {
@@ -102,9 +92,7 @@ public class UploadBuilder extends Builder {
         paramBean.setHost(host);
         paramBean.setApiKey(this.apiKey);
         paramBean.setScanDir(this.scanDir);
-        paramBean.setWildcard(this.wildcard);
-        paramBean.setUpdateDescription(this.updateDescription);
-        paramBean.setQrcodePath(this.qrcodePath);
+        paramBean.setSuiteId(this.suiteId);
         paramBean.setProjectId(this.projectId);
         return HttpUtils.upload(build, listener, paramBean);
     }
@@ -122,6 +110,10 @@ public class UploadBuilder extends Builder {
             load();
         }
 
+        public FormValidation doCheckProjectId(@QueryParameter Integer value) {
+            return ValidationParameters.doCheckProjectId(value);
+        }
+
         public FormValidation doCheckApiKey(@QueryParameter String value) {
             return ValidationParameters.doCheckApiKey(value);
         }
@@ -130,17 +122,12 @@ public class UploadBuilder extends Builder {
             return ValidationParameters.doCheckScanDir(value);
         }
 
-        public FormValidation doCheckWildcard(@QueryParameter String value) {
-            return ValidationParameters.doCheckWildcard(value);
-        }
-
         //所有项目
-        public ListBoxModel doFillProjectIdItems(@QueryParameter String scanDir, @QueryParameter String wildcard,
-                                                 @QueryParameter String apiKey) {
+        public ListBoxModel doFillProjectIdItems() {
             ListBoxModel items = new ListBoxModel();
             items.add(Messages._UploadBuilder_DescriptorImpl_choose_project().toString(), "");
             try {
-                HttpResult<List<Project>> httpResult = HttpUtils.listProject(apiKey);
+                HttpResult<List<Project>> httpResult = HttpUtils.listProject();
                 List<Project> list = httpResult.getData();
                 if (list != null && list.size() > 0) {
                     for (Project c : list) {

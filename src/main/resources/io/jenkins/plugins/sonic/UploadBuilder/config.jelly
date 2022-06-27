@@ -6,22 +6,21 @@
         <f:textbox default="$${WORKSPACE}"/>
     </f:entry>
 
-    <f:entry title="file wildcard" field="wildcard">
-        <f:textbox/>
-    </f:entry>
-
     <f:entry title="project" field="projectId">
          <f:select/>
     </f:entry>
 
-    <f:entry title="token(optional)" field="apiKey">
+    <f:entry title="token" field="apiKey">
         <f:password/>
     </f:entry>
 
     <f:advanced>
+<!--        <f:entry title="updateDescription(optional)" field="updateDescription">-->
+<!--            <f: default="Uploaded by jenkins upload-sonic plugin"/>-->
+<!--        </f:entry>-->
 
         <f:entry title="updateDescription(optional)" field="updateDescription">
-            <f:textarea default="Uploaded by jenkins upload-sonic plugin"/>
+            <f:textarea default="Uploaded by Sonic CI Helper"/>
         </f:entry>
 
         <f:entry title="qrcodePath(optional)" field="qrcodePath">

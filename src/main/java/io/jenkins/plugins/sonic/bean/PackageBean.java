@@ -6,6 +6,8 @@ public class PackageBean {
     private String platform;
     private String url;
     private String branch;
+    private String jobName;
+    private String buildNumber;
 
     public PackageBean() {
 
@@ -47,4 +49,23 @@ public class PackageBean {
         this.branch = branch;
     }
 
+    public String getBranch() {
+        return branch;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public String getBuildNumber() {
+        return buildNumber;
+    }
+
+    public void setBuildNumber(String buildNumber) {
+        this.buildNumber = buildNumber;
+    }
 }
