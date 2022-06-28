@@ -27,13 +27,11 @@ public class Logging {
     }
 
     public static void printHeader(BuildListener listener) {
-        listener.getLogger().println("\n" +
-                "   ▄▄▄▄      ▄▄▄▄    ▄▄▄   ▄▄   ▄▄▄▄▄▄      ▄▄▄▄\n" +
-                " ▄█▀▀▀▀█    ██▀▀██   ███   ██   ▀▀██▀▀    ██▀▀▀▀█\n" +
-                " ██▄       ██    ██  ██▀█  ██     ██     ██▀\n" +
-                "  ▀████▄   ██    ██  ██ ██ ██     ██     ██\n" +
-                "      ▀██  ██    ██  ██  █▄██     ██     ██▄\n" +
-                " █▄▄▄▄▄█▀   ██▄▄██   ██   ███   ▄▄██▄▄    ██▄▄▄▄█\n" +
-                "  ▀▀▀▀▀      ▀▀▀▀    ▀▀   ▀▀▀   ▀▀▀▀▀▀      ▀▀▀▀\n");
+        listener.getLogger().println("======================== Sonic CI Helper =========================");
+    }
+
+    public static void printTail(BuildListener listener) {
+        listener.getLogger().println(TAG + "Bye!");
+        listener.getLogger().println("==================================================================");
     }
 }

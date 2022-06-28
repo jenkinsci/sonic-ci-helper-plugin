@@ -18,7 +18,6 @@ package io.jenkins.plugins.sonic.utils;
 
 import com.ejlchina.data.TypeRef;
 import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.Process;
 import com.ejlchina.okhttps.gson.GsonMsgConvertor;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
@@ -35,13 +34,13 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class HttpUtils {
     private static final String UPLOAD_URL = "/server/api/folder/upload";
-    private static final String PROJECT_URL = "/api/controller/projects/list";
+    private static final String PROJECT_URL = "/server/api/controller/projects/list";
     private static final String PACKAGE_URL = "/server/api/controller/packages";
+    private static final String RUN_SUITE_URL = "/server/api/controller/testSuites/runSuite";
     private static final String SonicToken = "SonicToken";
     private static final String BRANCH = "${GIT_BRANCH}";
     private static final String BUILD_URL = "${BUILD_URL}";
@@ -51,8 +50,7 @@ public class HttpUtils {
             .build();
 
 
-    public static boolean upload(AbstractBuild<?, ?> build, BuildListener listener, ParamBean paramBean) throws IOException, InterruptedException {
-
+    public static boolean uploadAction(AbstractBuild<?, ?> build, BuildListener listener, ParamBean paramBean) throws IOException, InterruptedException {
         paramBean.setHost(build.getEnvironment(listener).expand(paramBean.getHost()));
         paramBean.setApiKey(Secret.fromString(build.getEnvironment(listener).expand(Secret.toString(paramBean.getApiKey()))));
         paramBean.setScanDir(build.getEnvironment(listener).expand(paramBean.getScanDir()));
@@ -66,14 +64,15 @@ public class HttpUtils {
         if (!StringUtils.hasText(path)) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missFile());
             return false;
+        } else {
+            Logging.logging(listener, Messages.UploadBuilder_Scan_result() + path);
         }
         File uploadFile = new File(path);
         if (!uploadFile.exists() || !uploadFile.isFile()) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missFile());
             return false;
         }
-        Logging.printHeader(listener);
-        String url = upload(build, uploadFile, listener, paramBean);
+        String url = uploadAction(build, uploadFile, listener, paramBean);
 
         if (url == null) {
             return false;
@@ -81,6 +80,14 @@ public class HttpUtils {
         String branch = getBranch(build, listener);
         String buildUrl = getBuildUrl(build, listener);
         savePackageInfo(paramBean, listener, uploadFile.getName(), url, platform(uploadFile.getName()), branch, buildUrl);
+        if (StringUtils.hasText(paramBean.getSuiteId())) {
+            try {
+                int suiteId = Integer.parseInt(paramBean.getSuiteId());
+                runSuite(paramBean, listener, suiteId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return true;
     }
 
@@ -102,14 +109,14 @@ public class HttpUtils {
         return buildUrl;
     }
 
-    private static String upload(AbstractBuild<?, ?> build, File uploadFile, BuildListener listener, ParamBean paramBean) {
+    private static String uploadAction(AbstractBuild<?, ?> build, File uploadFile, BuildListener listener, ParamBean paramBean) {
         HttpCall call = buildHttp(paramBean, UPLOAD_URL)
                 .addFilePara("file", uploadFile)
                 .addBodyPara("type", "packageFiles")
                 .stepRate(0.05)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）
-                .setOnProcess(process -> Logging.logging(listener, "upload progress: " + (int) (process.getRate() * 100) + " %"))
+                .setOnProcess(process -> Logging.logging(listener, Messages.UploadBuilder_Upload_progress() + (int) (process.getRate() * 100) + " %"))
                 .setOnException(e -> {
-                    Logging.logging(listener, "upload exception: ");
+                    Logging.logging(listener, Messages.UploadBuilder_Upload_exception());
                     Logging.logging(listener, e.fillInStackTrace().toString());
                 })
                 .post();
@@ -120,15 +127,13 @@ public class HttpUtils {
                     return super.getType();
                 }
             });
-            Logging.logging(listener, "${appURL}: " + httpResult.getData());
+            Logging.logging(listener, Messages.UploadBuilder_Upload_result() + httpResult.getData());
             build.addAction(new PublishEnvVarAction("appURL", httpResult.getData()));
 
             return httpResult.getData();
         }
-        Logging.logging(listener, "===================");
-        Logging.logging(listener, "Upload file failed.");
+        Logging.logging(listener, Messages.UploadBuilder_Upload_fail());
         Logging.logging(listener, call.getResult().toString());
-        Logging.logging(listener, "===================");
         return null;
     }
 
@@ -156,17 +161,38 @@ public class HttpUtils {
                     return super.getType();
                 }
             });
-            Logging.logging(listener, "===================");
-            Logging.logging(listener, "Send package info successful!");
-            Logging.logging(listener, httpResult.toString());
+            Logging.logging(listener, Messages.UploadBuilder_Package_success() + httpResult.getCode());
         } else {
-            Logging.logging(listener, "===================");
-            Logging.logging(listener, "Send package info failed.");
+            Logging.logging(listener, Messages.UploadBuilder_Package_fail());
             Logging.logging(listener, result.toString());
 
         }
-        Logging.logging(listener, "===================");
 
+    }
+
+    private static void runSuite(ParamBean paramBean, BuildListener listener, int suiteId) {
+        com.ejlchina.okhttps.HttpResult result = http.sync(paramBean.getHost() + RUN_SUITE_URL)
+                .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()))
+                .addUrlPara("id", suiteId)
+                .get();
+        Logging.logging(listener, Messages.UploadBuilder_Suite_tips() + suiteId);
+
+        if (result.isSuccessful()) {
+            HttpResult<String> httpResult = result.getBody().toBean(new TypeRef<HttpResult<String>>() {
+                @Override
+                public Type getType() {
+                    return super.getType();
+                }
+            });
+            if (httpResult.getCode() == 2000 || httpResult.getCode() == 3003) {
+                Logging.logging(listener, Messages.UploadBuilder_Suite_success() + httpResult);
+            } else {
+                Logging.logging(listener, Messages.UploadBuilder_Suite_fail() + httpResult);
+            }
+        } else {
+            Logging.logging(listener, Messages.UploadBuilder_Suite_fail());
+            Logging.logging(listener, result.toString());
+        }
     }
 
     private static AHttpTask buildHttp(ParamBean paramBean, String uri) {
@@ -178,7 +204,7 @@ public class HttpUtils {
         String host = SonicGlobalConfiguration.get().getHost();
 
         if (host == null) {
-            throw new AssertionError("Sonic Url is null! Please set it in GlobalConfiguration.");
+            throw new AssertionError(Messages.SonicGlobalConfiguration_error_exception());
         }
         return http.sync(host + PROJECT_URL)
                 .get()
@@ -195,15 +221,15 @@ public class HttpUtils {
 
     public static String findFile(String scandir, BuildListener listener) {
         File dir = new File(scandir);
+        Logging.logging(listener, Messages.UploadBuilder_Scan_dir() + dir.getAbsolutePath());
         if (!dir.exists() || !dir.isDirectory()) {
-            Logging.logging(listener, "Scan dir:" + dir.getAbsolutePath());
-            Logging.logging(listener, "Scan dir isn't exist or it's not a directory!");
+            Logging.logging(listener, Messages.UploadBuilder_Scan_error());
             return null;
         }
 
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(scandir);
-        scanner.setIncludes(new String[]{"ipa", "apk"});
+        scanner.setIncludes(new String[]{"*.apk", "*.ipa"});
         scanner.setCaseSensitive(true);
         scanner.scan();
         String[] uploadFiles = scanner.getIncludedFiles();

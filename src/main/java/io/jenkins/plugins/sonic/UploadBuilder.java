@@ -30,6 +30,7 @@ import io.jenkins.plugins.sonic.bean.HttpResult;
 import io.jenkins.plugins.sonic.bean.ParamBean;
 import io.jenkins.plugins.sonic.bean.Project;
 import io.jenkins.plugins.sonic.utils.HttpUtils;
+import io.jenkins.plugins.sonic.utils.Logging;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -43,7 +44,7 @@ import java.util.logging.Logger;
 /**
  * upload to jenkins
  *
- * @author yaming116,Eason
+ * @author yaming116, Eason
  */
 public class UploadBuilder extends Builder {
     private static final Logger LOGGER = Logger.getLogger(UploadBuilder.class.getName());
@@ -94,7 +95,10 @@ public class UploadBuilder extends Builder {
         paramBean.setScanDir(this.scanDir);
         paramBean.setSuiteId(this.suiteId);
         paramBean.setProjectId(this.projectId);
-        return HttpUtils.upload(build, listener, paramBean);
+        Logging.printHeader(listener);
+        boolean status = HttpUtils.uploadAction(build, listener, paramBean);
+        Logging.printTail(listener);
+        return status;
     }
 
     @Override
