@@ -5,5 +5,5 @@
 1. You can upload your package to Sonic.
 2. You can run suite after build.
 
-# License
-[LICENSE]
+## License
+[LICENSE](LICENSE)
