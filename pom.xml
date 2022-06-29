@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>sonic-ci</artifactId>
+    <artifactId>sonic-ci-helper</artifactId>
     <version>1.0.0</version>
     <packaging>hpi</packaging>
     <properties>
