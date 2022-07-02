@@ -1,12 +1,12 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/SonicCloudOrg/sonic-server/main/logo.png">
 </p>
-<p align="center">🎉Sonic Cloud Real Machine Testing Platform.</p>
+<p align="center">🎉Sonic云真机测试平台</p>
 <p align="center">
-  <span>English |</span>
-  <a href="https://github.com/SonicCloudOrg/sonic-ci-helper/blob/main/README_CN.md">  
-     简体中文
+  <a href="https://github.com/SonicCloudOrg/sonic-ci-helper/blob/main/README.md">  
+    English
   </a>
+  <span>| 简体中文</span>
 </p>
 <p align="center">
   <a href="#">  
@@ -20,48 +20,48 @@
   </a>
 </p>
 
-### Official Website
-[Sonic Official Website](https://sonic-cloud.gitee.io)
-## Background
+### 官方网站
+ [Sonic Official Website](https://sonic-cloud.gitee.io)
+## 背景
 
-#### What is sonic ?
+#### 什么是Sonic？
 
-> Nowadays, automatic testing, remote control and other technologies have gradually matured. [Appium](https://github.com/appium/appium) can be said to be the leader in the field of automation, and [STF](https://github.com/openstf/stf) is the ancestor of remote control. A long time ago, I began to have an idea about whether to provide test solutions for all clients (Android, IOS, windows, MAC and web applications) on one platform. Therefore, sonic cloud real machine testing platform was born.
+> 如今，自动化测试、远程控制等技术已经逐渐成熟。其中 [Appium](https://github.com/appium/appium) 在自动化领域可以说是领头者，[STF](https://github.com/openstf/stf) 则是远程控制的始祖。很久前就开始有了一个想法，是否可以在一个平台上，提供解决所有客户端（Android、iOS、Windows、Mac、Web应用）的测试方案，于是，Sonic云真机测试平台由此诞生。
 
-#### Vision
+#### 愿景
 
-> Sonic's vision is to help small and medium-sized enterprises solve the problem of lack of tools and testing means in client automation or remote control.
+> Sonic当前的愿景是能帮助中小型企业解决在客户端自动化或远控方面缺少工具和测试手段的问题。
 >
->If you want to participate, welcome to join! 💪
+>  如果你想参与其中，欢迎加入！💪
 >
->If you want to support, you can give me a star. ⭐
+> 如果你想支持，可以给我一个star。⭐
 
-#### What can sonic do ?
+#### Sonic能做什么？
 
-+ 0 coding for automated testing
-+ Make full use of devices (24hours)
-+ Remotely control your device (Android,iOS)
-+ Perform UI automation tests,Stability tests and Traversal tests with devices
-+ Connect CI/CD platform (Jenkins)
-+ Visual report
-+ And more...
++ 0编码实现自动化测试
++ 充分利用您的设备（24小时）
++ 远程控制您的设备（安卓、iOS甚至鸿蒙）
++ 在设备执行UI自动化、稳定性和遍历测试
++ 连接CI/CD平台（例如Jenkins）
++ 可视化报表
++ 更多...
 
-## How to package
+## 打包方式
 
 ```
-mvn package
+mvn package 
 ```
 
-## Sponsors
 
-Thank you to all our sponsors!
+## 赞助商
+
+感谢所有赞助商！
 
 [<img src="https://ceshiren.com/uploads/default/original/3X/7/0/70299922296e93e2dcab223153a928c4bfb27df9.jpeg" alt="霍格沃兹测试开发学社" width="500">](https://qrcode.testing-studio.com/f?from=sonic&url=https://ceshiren.com)
 
 > [霍格沃兹测试开发学社](https://qrcode.testing-studio.com/f?from=sonic&url=https://ceshiren.com)是业界领先的测试开发技术高端教育品牌，隶属于[测吧（北京）科技有限公司](http://qrcode.testing-studio.com/f?from=sonic&url=https://www.testing-studio.com) 。学院课程由一线大厂测试经理与资深测试开发专家参与研发，实战驱动。课程涵盖 web/app 自动化测试、接口测试、性能测试、安全测试、持续集成/持续交付/DevOps，测试左移&右移、精准测试、测试平台开发、测试管理等内容，帮助测试工程师实现测试开发技术转型。通过优秀的学社制度（奖学金、内推返学费、行业竞赛等多种方式）来实现学员、学社及用人企业的三方共赢。[进入测试开发技术能力测评!](https://qrcode.testing-studio.com/f?from=sonic&url=https://ceshiren.com/t/topic/14940)
 
 
-## LICENSE
+## 开源许可协议
 
 [License](LICENSE)
-

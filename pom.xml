@@ -5,15 +5,15 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.38</version>
-        <relativePath/>
+        <version>3.43</version>
+        <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>sonic-ci-helper</artifactId>
     <version>1.0.0</version>
     <packaging>hpi</packaging>
     <properties>
-        <jenkins.version>2.277.1</jenkins.version>
+        <jenkins.version>2.164.1</jenkins.version>
         <java.level>8</java.level>
     </properties>
     <name>Sonic CI Helper</name>
@@ -106,6 +106,8 @@
             <timezone>+8</timezone>
         </developer>
     </developers>
+
+    <url>https://sonic-cloud.gitee.io/#/SCH</url>
 
     <!-- Assuming you want to host on @jenkinsci:
     <url>https://wiki.jenkins.io/display/JENKINS/TODO+Plugin</url>
