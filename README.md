@@ -46,6 +46,10 @@
 + Visual report
 + And more...
 
+## How to use?
+
+[Clink Here!](https://sonic-cloud.gitee.io/#/SCH)
+
 ## How to package
 
 ```
