@@ -19,6 +19,7 @@ package io.jenkins.plugins.sonic.utils;
 import com.ejlchina.data.TypeRef;
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.gson.GsonMsgConvertor;
+import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.util.Secret;
@@ -67,18 +68,14 @@ public class HttpUtils {
         } else {
             Logging.logging(listener, Messages.UploadBuilder_Scan_result() + path);
         }
-        File uploadFile = new File(path);
-        if (!uploadFile.exists() || !uploadFile.isFile()) {
-            Logging.logging(listener, Messages.UploadBuilder_Http_error_missFile());
-            return false;
-        }
-        String url = uploadAction(build, uploadFile, listener, paramBean);
+        String url = uploadAction(build, new File(path), listener, paramBean);
 
         if (url == null) {
             return false;
         }
         String branch = getBranch(build, listener);
         String buildUrl = getBuildUrl(build, listener);
+        FilePath uploadFile = new FilePath(new File(path));
         savePackageInfo(paramBean, listener, uploadFile.getName(), url, platform(uploadFile.getName()), branch, buildUrl);
         if (StringUtils.hasText(paramBean.getSuiteId())) {
             try {
@@ -220,10 +217,18 @@ public class HttpUtils {
 
 
     public static String findFile(String scandir, BuildListener listener) {
-        File dir = new File(scandir);
-        Logging.logging(listener, Messages.UploadBuilder_Scan_dir() + dir.getAbsolutePath());
-        if (!dir.exists() || !dir.isDirectory()) {
-            Logging.logging(listener, Messages.UploadBuilder_Scan_error());
+        FilePath dir = new FilePath(new File(scandir));
+        Logging.logging(listener, Messages.UploadBuilder_Scan_dir() + dir);
+        try {
+            if (!dir.exists() || !dir.isDirectory()) {
+                Logging.logging(listener, Messages.UploadBuilder_Scan_error());
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
             return null;
         }
 
@@ -238,16 +243,23 @@ public class HttpUtils {
             return null;
         }
         if (uploadFiles.length == 1) {
-            return new File(dir, uploadFiles[0]).getAbsolutePath();
+            return new File(scandir, uploadFiles[0]).getAbsolutePath();
         }
 
         List<String> strings = Arrays.asList(uploadFiles);
         Collections.sort(strings, (o1, o2) -> {
-            File file1 = new File(dir, o1);
-            File file2 = new File(dir, o2);
+            File file1 = new File(scandir, o1);
+            File file2 = new File(scandir, o2);
             return Long.compare(file2.lastModified(), file1.lastModified());
         });
-        String uploadFiltPath = new File(dir, strings.get(0)).getAbsolutePath();
+        String uploadFiltPath = null;
+        try {
+            uploadFiltPath = new FilePath(new File(scandir, strings.get(0))).readToString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Logging.logging(listener, "Found " + uploadFiles.length + " files, the default choice of the latest modified file!");
         Logging.logging(listener, "The latest modified file is " + uploadFiltPath);
         return uploadFiltPath;
