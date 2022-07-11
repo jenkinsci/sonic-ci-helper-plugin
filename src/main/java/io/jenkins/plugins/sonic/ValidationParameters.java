@@ -22,11 +22,10 @@ import org.apache.commons.lang.StringUtils;
 class ValidationParameters {
 
     public static FormValidation doCheckApiKey(String value) {
-        if (StringUtils.isEmpty(value) &&
-                value.length() == 0) {
+        if (StringUtils.isEmpty(value)) {
             return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missApiKey());
         }
-        return FormValidation.ok();
+        return checkHost();
     }
 
     public static FormValidation doCheckProjectId(Integer value) {
@@ -34,14 +33,23 @@ class ValidationParameters {
                 value == 0) {
             return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missProjectId());
         }
+
+        return checkHost();
+    }
+
+    private static FormValidation checkHost() {
+        String host = SonicGlobalConfiguration.get().getHost();
+        if (StringUtils.isEmpty(host)) {
+            return FormValidation.error(Messages.SonicGlobalConfiguration_error_exception());
+        }
         return FormValidation.ok();
     }
 
     public static FormValidation doCheckScanDir(String value) {
-        if (value.length() == 0) {
-            return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missScanDir());
-        }
-        return FormValidation.ok();
+//        if (value.length() == 0) {
+//            return FormValidation.error(Messages.UploadBuilder_DescriptorImpl_error_missScanDir());
+//        }
+        return checkHost();
     }
 
 }
