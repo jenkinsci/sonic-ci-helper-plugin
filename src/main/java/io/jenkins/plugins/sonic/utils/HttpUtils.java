@@ -61,7 +61,7 @@ public class HttpUtils {
             return false;
         }
 
-        String path = findFile(paramBean.getScanDir(), listener);
+        String path = findFile(paramBean.getWorkspace(), paramBean.getScanDir(), listener);
         if (!StringUtils.hasText(path)) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missFile());
             return false;
@@ -82,6 +82,7 @@ public class HttpUtils {
                 int suiteId = Integer.parseInt(paramBean.getSuiteId());
                 runSuite(paramBean, listener, suiteId);
             } catch (Exception e) {
+                Logging.logging(listener, e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -201,7 +202,7 @@ public class HttpUtils {
         String host = SonicGlobalConfiguration.get().getHost();
 
         if (host == null) {
-            throw new AssertionError(Messages.SonicGlobalConfiguration_error_exception());
+            return null;
         }
         return http.sync(host + PROJECT_URL)
                 .get()
@@ -216,8 +217,13 @@ public class HttpUtils {
     }
 
 
-    public static String findFile(String scandir, BuildListener listener) {
-        FilePath dir = new FilePath(new File(scandir));
+    public static String findFile(FilePath workspace, String scandir, BuildListener listener) {
+        FilePath dir = null;
+        if (StringUtils.hasText(scandir)) {
+            dir = new FilePath(workspace, scandir);
+        }else {
+            dir = workspace;
+        }
         Logging.logging(listener, Messages.UploadBuilder_Scan_dir() + dir);
         try {
             if (!dir.exists() || !dir.isDirectory()) {
@@ -233,8 +239,8 @@ public class HttpUtils {
         }
 
         DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir(scandir);
-        scanner.setIncludes(new String[]{"*.apk", "*.ipa"});
+        scanner.setBasedir(dir.getRemote());
+        scanner.setIncludes(new String[]{"**/*.apk", "**/*.ipa"});
         scanner.setCaseSensitive(true);
         scanner.scan();
         String[] uploadFiles = scanner.getIncludedFiles();
@@ -243,18 +249,19 @@ public class HttpUtils {
             return null;
         }
         if (uploadFiles.length == 1) {
-            return new File(scandir, uploadFiles[0]).getAbsolutePath();
+            return new File(dir.getRemote(), uploadFiles[0]).getAbsolutePath();
         }
 
         List<String> strings = Arrays.asList(uploadFiles);
+        FilePath finalDir = dir;
         Collections.sort(strings, (o1, o2) -> {
-            File file1 = new File(scandir, o1);
-            File file2 = new File(scandir, o2);
+            File file1 = new File(finalDir.getRemote(), o1);
+            File file2 = new File(finalDir.getRemote(), o2);
             return Long.compare(file2.lastModified(), file1.lastModified());
         });
         String uploadFiltPath = null;
         try {
-            uploadFiltPath = new FilePath(new File(scandir, strings.get(0))).readToString();
+            uploadFiltPath = new FilePath(dir, strings.get(0)).readToString();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

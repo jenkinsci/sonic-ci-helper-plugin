@@ -16,6 +16,7 @@
  */
 package io.jenkins.plugins.sonic.bean;
 
+import hudson.FilePath;
 import hudson.util.Secret;
 
 public class ParamBean {
@@ -24,6 +25,7 @@ public class ParamBean {
     private String scanDir;
     private String suiteId;
     private String projectId;
+    private FilePath workspace;
 
     public ParamBean(){}
 
@@ -65,5 +67,13 @@ public class ParamBean {
 
     public String getProjectId() {
         return projectId;
+    }
+
+    public void setWorkspace(FilePath workspace) {
+        this.workspace = workspace;
+    }
+
+    public FilePath getWorkspace() {
+        return workspace;
     }
 }

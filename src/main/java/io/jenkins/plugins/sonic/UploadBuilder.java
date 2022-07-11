@@ -16,11 +16,11 @@
  */
 package io.jenkins.plugins.sonic;
 
+import hudson.AbortException;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
+import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
@@ -85,11 +85,19 @@ public class UploadBuilder extends Builder {
         return projectId;
     }
 
+
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        // delegate to the overloaded version defined in SimpleBuildStep
+        FilePath workspace = build.getWorkspace();
+        if (workspace == null) {
+            throw new AbortException("no workspace for " + build);
+        }
+
         String host = SonicGlobalConfiguration.get().getHost();
 
         ParamBean paramBean = new ParamBean();
+        paramBean.setWorkspace(workspace);
         paramBean.setHost(host);
         paramBean.setApiKey(this.apiKey);
         paramBean.setScanDir(this.scanDir);
@@ -101,10 +109,13 @@ public class UploadBuilder extends Builder {
         return status;
     }
 
+
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
     }
+
+
 
     @Symbol("upload-sonic")
     @Extension
@@ -132,7 +143,7 @@ public class UploadBuilder extends Builder {
             items.add(Messages._UploadBuilder_DescriptorImpl_choose_project().toString(), "");
             try {
                 HttpResult<List<Project>> httpResult = HttpUtils.listProject();
-                List<Project> list = httpResult.getData();
+                List<Project> list = httpResult == null ? null : httpResult.getData();
                 if (list != null && list.size() > 0) {
                     for (Project c : list) {
                         items.add(c.getProjectName(), String.valueOf(c.getId()));
@@ -140,7 +151,6 @@ public class UploadBuilder extends Builder {
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, e.getMessage(), e);
-                throw new AssertionError(Messages._UploadBuilder_Http_error_fail());
             }
             return items;
         }
