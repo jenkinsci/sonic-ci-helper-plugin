@@ -68,15 +68,16 @@ public class HttpUtils {
         } else {
             Logging.logging(listener, Messages.UploadBuilder_Scan_result() + path);
         }
-        String url = uploadAction(build, new File(path), listener, paramBean);
+        File file = new File(path);
+        final String fileName = file.getName();
+        String url = uploadAction(build, file, listener, paramBean);
 
         if (url == null) {
             return false;
         }
         String branch = getBranch(build, listener);
         String buildUrl = getBuildUrl(build, listener);
-        FilePath uploadFile = new FilePath(new File(path));
-        savePackageInfo(paramBean, listener, uploadFile.getName(), url, platform(uploadFile.getName()), branch, buildUrl);
+        savePackageInfo(paramBean, listener, fileName, url, platform(fileName), branch, buildUrl);
         if (StringUtils.hasText(paramBean.getSuiteId())) {
             try {
                 int suiteId = Integer.parseInt(paramBean.getSuiteId());
@@ -249,24 +250,25 @@ public class HttpUtils {
             return null;
         }
         if (uploadFiles.length == 1) {
-            return new File(dir.getRemote(), uploadFiles[0]).getAbsolutePath();
+            return new FilePath(dir, uploadFiles[0]).getRemote();
         }
 
         List<String> strings = Arrays.asList(uploadFiles);
         FilePath finalDir = dir;
         Collections.sort(strings, (o1, o2) -> {
-            File file1 = new File(finalDir.getRemote(), o1);
-            File file2 = new File(finalDir.getRemote(), o2);
-            return Long.compare(file2.lastModified(), file1.lastModified());
+            FilePath file1 = new FilePath(finalDir, o1);
+            FilePath file2 = new FilePath(finalDir, o2);
+            try {
+                return Long.compare(file2.lastModified(), file1.lastModified());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return 0;
         });
-        String uploadFiltPath = null;
-        try {
-            uploadFiltPath = new FilePath(dir, strings.get(0)).readToString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        String uploadFiltPath = new FilePath(dir, strings.get(0)).getRemote();
         Logging.logging(listener, "Found " + uploadFiles.length + " files, the default choice of the latest modified file!");
         Logging.logging(listener, "The latest modified file is " + uploadFiltPath);
         return uploadFiltPath;
