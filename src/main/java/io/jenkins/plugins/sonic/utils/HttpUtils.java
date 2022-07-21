@@ -27,10 +27,15 @@ import io.jenkins.plugins.sonic.Messages;
 import io.jenkins.plugins.sonic.SonicGlobalConfiguration;
 import io.jenkins.plugins.sonic.bean.*;
 import io.jenkins.plugins.sonic.bean.HttpResult;
-import org.apache.tools.ant.DirectoryScanner;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -61,16 +66,16 @@ public class HttpUtils {
             return false;
         }
 
-        String path = findFile(paramBean.getWorkspace(), paramBean.getScanDir(), listener);
-        if (!StringUtils.hasText(path)) {
+        FilePath path = findFile(paramBean.getWorkspace(), paramBean.getScanDir(), listener);
+        if (null == path) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missFile());
             return false;
         } else {
-            Logging.logging(listener, Messages.UploadBuilder_Scan_result() + path);
+            Logging.logging(listener, Messages.UploadBuilder_Scan_result() + path.getRemote());
         }
-        File file = new File(path);
-        final String fileName = file.getName();
-        String url = uploadAction(build, file, listener, paramBean);
+
+        final String fileName = path.getName();
+        String url = uploadAction(build, path, listener, paramBean);
 
         if (url == null) {
             return false;
@@ -108,10 +113,9 @@ public class HttpUtils {
         return buildUrl;
     }
 
-    private static String uploadAction(AbstractBuild<?, ?> build, File uploadFile, BuildListener listener, ParamBean paramBean) {
+    private static String uploadAction(AbstractBuild<?, ?> build, FilePath uploadFile, BuildListener listener, ParamBean paramBean) {
         HttpCall call = buildHttp(paramBean, UPLOAD_URL)
-                .addFilePara("file", uploadFile)
-                .addBodyPara("type", "packageFiles")
+                .setBodyPara(buildFilePart(uploadFile))
                 .stepRate(0.05)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）
                 .setOnProcess(process -> Logging.logging(listener, Messages.UploadBuilder_Upload_progress() + (int) (process.getRate() * 100) + " %"))
                 .setOnException(e -> {
@@ -119,6 +123,8 @@ public class HttpUtils {
                     Logging.logging(listener, e.fillInStackTrace().toString());
                 })
                 .post();
+
+
         if (call.getResult().isSuccessful()) {
             HttpResult<String> httpResult = call.getResult().getBody().toBean(new TypeRef<HttpResult<String>>() {
                 @Override
@@ -134,6 +140,42 @@ public class HttpUtils {
         Logging.logging(listener, Messages.UploadBuilder_Upload_fail());
         Logging.logging(listener, call.getResult().toString());
         return null;
+    }
+
+    private static RequestBody buildFilePart(FilePath filePath) {
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        builder.setType(MultipartBody.FORM);
+        builder.addFormDataPart("type", "packageFiles");
+        builder.addFormDataPart("file", filePath.getName(),new RequestBody(){
+            @Override
+            public long contentLength() throws IOException {
+                try {
+                    return filePath.length();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return -1;
+            }
+
+            @Nullable
+            @Override
+            public MediaType contentType() {
+                return MediaType.parse("application/octet-stream");
+            }
+
+            @Override
+            public void writeTo(BufferedSink bufferedSink) throws IOException {
+                try {
+                    try (Source source = Okio.source(filePath.read())) {
+                        bufferedSink.writeAll(source);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        return builder.build();
     }
 
     private static void savePackageInfo(ParamBean paramBean, BuildListener listener, String name,
@@ -218,7 +260,7 @@ public class HttpUtils {
     }
 
 
-    public static String findFile(FilePath workspace, String scandir, BuildListener listener) {
+    public static FilePath findFile(FilePath workspace, String scandir, BuildListener listener) {
         FilePath dir = null;
         if (StringUtils.hasText(scandir)) {
             dir = new FilePath(workspace, scandir);
@@ -226,11 +268,14 @@ public class HttpUtils {
             dir = workspace;
         }
         Logging.logging(listener, Messages.UploadBuilder_Scan_dir() + dir);
+        FilePath[] uploadFiles = null;
         try {
             if (!dir.exists() || !dir.isDirectory()) {
                 Logging.logging(listener, Messages.UploadBuilder_Scan_error());
                 return null;
             }
+
+            uploadFiles = dir.list("**/*.apk,**/*.ipa");
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -239,27 +284,19 @@ public class HttpUtils {
             return null;
         }
 
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir(dir.getRemote());
-        scanner.setIncludes(new String[]{"**/*.apk", "**/*.ipa"});
-        scanner.setCaseSensitive(true);
-        scanner.scan();
-        String[] uploadFiles = scanner.getIncludedFiles();
-
         if (uploadFiles == null || uploadFiles.length == 0) {
             return null;
         }
         if (uploadFiles.length == 1) {
-            return new FilePath(dir, uploadFiles[0]).getRemote();
+            return uploadFiles[0];
         }
 
-        List<String> strings = Arrays.asList(uploadFiles);
+        List<FilePath> strings = Arrays.asList(uploadFiles);
         FilePath finalDir = dir;
         Collections.sort(strings, (o1, o2) -> {
-            FilePath file1 = new FilePath(finalDir, o1);
-            FilePath file2 = new FilePath(finalDir, o2);
+
             try {
-                return Long.compare(file2.lastModified(), file1.lastModified());
+                return Long.compare(o1.lastModified(), o2.lastModified());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -268,10 +305,10 @@ public class HttpUtils {
             return 0;
         });
 
-        String uploadFiltPath = new FilePath(dir, strings.get(0)).getRemote();
+        String uploadFiltPath = strings.get(0).getRemote();
         Logging.logging(listener, "Found " + uploadFiles.length + " files, the default choice of the latest modified file!");
         Logging.logging(listener, "The latest modified file is " + uploadFiltPath);
-        return uploadFiltPath;
+        return strings.get(0);
     }
 
 
