@@ -292,7 +292,6 @@ public class HttpUtils {
         }
 
         List<FilePath> strings = Arrays.asList(uploadFiles);
-        FilePath finalDir = dir;
         Collections.sort(strings, (o1, o2) -> {
 
             try {
