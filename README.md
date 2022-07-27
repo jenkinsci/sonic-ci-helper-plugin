@@ -15,10 +15,14 @@
   <a href="#">  
     <img src="https://img.shields.io/github/commit-activity/m/SonicCloudOrg/sonic-ci-helper">
   </a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin.svg?type=shield"/></a>
   <a href="https://github.com/SonicCloudOrg/sonic-ci-helper/blob/main/LICENSE">  
     <img src="https://img.shields.io/github/license/SonicCloudOrg/sonic-ci-helper?color=green&label=license&logo=license&logoColor=green">
   </a>
 </p>
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin?ref=badge_large)
 
 ### Official Website
 [Sonic Official Website](https://sonic-cloud.gitee.io)
@@ -68,4 +72,3 @@ Thank you to all our sponsors!
 ## LICENSE
 
 [License](LICENSE)
-
