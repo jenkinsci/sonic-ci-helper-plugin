@@ -21,9 +21,6 @@
   </a>
 </p>
 
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin?ref=badge_large)
-
 ### Official Website
 [Sonic Official Website](https://sonic-cloud.gitee.io)
 ## Background
@@ -72,3 +69,5 @@ Thank you to all our sponsors!
 ## LICENSE
 
 [License](LICENSE)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSonicCloudOrg%2Fsonic-ci-helper-plugin?ref=badge_large)
