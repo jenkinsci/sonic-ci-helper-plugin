@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>structs</artifactId>
-            <version>1.19</version>
+            <version>324.va_f5d6774f3a_d</version>
         </dependency>
         <dependency>
             <groupId>com.github.yaming116</groupId>
