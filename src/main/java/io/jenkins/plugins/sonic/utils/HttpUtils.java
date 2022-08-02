@@ -29,6 +29,7 @@ import io.jenkins.plugins.sonic.bean.*;
 import io.jenkins.plugins.sonic.bean.HttpResult;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import okio.Okio;
@@ -41,6 +42,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class HttpUtils {
     private static final String UPLOAD_URL = "/server/api/folder/upload";
@@ -52,6 +54,14 @@ public class HttpUtils {
     private static final String BUILD_URL = "${BUILD_URL}";
     private static final HTTP http = HTTP.builder()
             .bodyType("json")
+            .config((OkHttpClient.Builder builder) -> {
+                // 连接超时时间（默认10秒）
+                builder.connectTimeout(10, TimeUnit.SECONDS);
+                // 写入超时时间10分钟
+                builder.writeTimeout(10, TimeUnit.MINUTES);
+                // 读取超时时间10分钟
+                builder.readTimeout(10, TimeUnit.MINUTES);
+            })
             .addMsgConvertor(new GsonMsgConvertor())
             .build();
 
