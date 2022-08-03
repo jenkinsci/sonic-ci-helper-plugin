@@ -10,7 +10,7 @@
 </p>
 <p align="center">
   <a href="#">  
-    <img src="https://img.shields.io/github/v/release/SonicCloudOrg/sonic-ci-helper?include_prereleases">
+    <img src="https://img.shields.io/github/v/tag/jenkinsci/sonic-ci-helper-plugin">
   </a>
   <a href="#">  
     <img src="https://img.shields.io/github/commit-activity/m/SonicCloudOrg/sonic-ci-helper">
