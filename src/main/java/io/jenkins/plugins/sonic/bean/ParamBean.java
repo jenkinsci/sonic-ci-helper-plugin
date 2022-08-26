@@ -16,6 +16,7 @@
  */
 package io.jenkins.plugins.sonic.bean;
 
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.util.Secret;
 
@@ -26,6 +27,7 @@ public class ParamBean {
     private String suiteId;
     private String projectId;
     private FilePath workspace;
+    private EnvVars env;
 
     public ParamBean(){}
 
@@ -75,5 +77,13 @@ public class ParamBean {
 
     public FilePath getWorkspace() {
         return workspace;
+    }
+
+    public void setEnv(EnvVars env) {
+        this.env = env;
+    }
+
+    public EnvVars getEnv() {
+        return env;
     }
 }
