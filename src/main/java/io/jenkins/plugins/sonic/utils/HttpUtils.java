@@ -20,8 +20,7 @@ import com.ejlchina.data.TypeRef;
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.gson.GsonMsgConvertor;
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
+import hudson.model.Run;
 import hudson.util.Secret;
 import io.jenkins.plugins.sonic.Messages;
 import io.jenkins.plugins.sonic.SonicGlobalConfiguration;
@@ -56,7 +55,7 @@ public class HttpUtils {
             .build();
 
 
-    public static boolean uploadAction(AbstractBuild<?, ?> build, BuildListener listener, ParamBean paramBean) throws IOException, InterruptedException {
+    public static boolean uploadAction(Run<?, ?> build, hudson.model.TaskListener listener, ParamBean paramBean) throws IOException, InterruptedException {
         paramBean.setHost(build.getEnvironment(listener).expand(paramBean.getHost()));
         paramBean.setApiKey(Secret.fromString(build.getEnvironment(listener).expand(Secret.toString(paramBean.getApiKey()))));
         paramBean.setScanDir(build.getEnvironment(listener).expand(paramBean.getScanDir()));
@@ -95,7 +94,7 @@ public class HttpUtils {
         return true;
     }
 
-    private static String getBranch(AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
+    private static String getBranch(Run<?, ?> build, hudson.model.TaskListener listener) throws IOException, InterruptedException {
         String branch = build.getEnvironment(listener).expand(BRANCH);
 
         if (BRANCH.equals(branch)) {
@@ -104,7 +103,7 @@ public class HttpUtils {
         return branch;
     }
 
-    private static String getBuildUrl(AbstractBuild<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
+    private static String getBuildUrl(Run<?, ?> build, hudson.model.TaskListener listener) throws IOException, InterruptedException {
         String buildUrl = build.getEnvironment(listener).expand(BUILD_URL);
 
         if (BUILD_URL.equals(buildUrl)) {
@@ -113,7 +112,7 @@ public class HttpUtils {
         return buildUrl;
     }
 
-    private static String uploadAction(AbstractBuild<?, ?> build, FilePath uploadFile, BuildListener listener, ParamBean paramBean) {
+    private static String uploadAction(Run<?, ?> build, FilePath uploadFile, hudson.model.TaskListener listener, ParamBean paramBean) {
         HttpCall call = buildHttp(paramBean, UPLOAD_URL)
                 .setBodyPara(buildFilePart(uploadFile))
                 .stepRate(0.05)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）
@@ -178,7 +177,7 @@ public class HttpUtils {
         return builder.build();
     }
 
-    private static void savePackageInfo(ParamBean paramBean, BuildListener listener, String name,
+    private static void savePackageInfo(ParamBean paramBean, hudson.model.TaskListener listener, String name,
                                         String url, String platform, String branch, String buildUrl) {
 
         PackageBean packageBean = new PackageBean();
@@ -211,7 +210,7 @@ public class HttpUtils {
 
     }
 
-    private static void runSuite(ParamBean paramBean, BuildListener listener, int suiteId) {
+    private static void runSuite(ParamBean paramBean, hudson.model.TaskListener listener, int suiteId) {
         com.ejlchina.okhttps.HttpResult result = http.sync(paramBean.getHost() + RUN_SUITE_URL)
                 .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()))
                 .addUrlPara("id", suiteId)
@@ -260,7 +259,7 @@ public class HttpUtils {
     }
 
 
-    public static FilePath findFile(FilePath workspace, String scandir, BuildListener listener) {
+    public static FilePath findFile(FilePath workspace, String scandir, hudson.model.TaskListener listener) {
         FilePath dir = null;
         if (StringUtils.hasText(scandir)) {
             dir = new FilePath(workspace, scandir);

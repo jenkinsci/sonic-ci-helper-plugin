@@ -16,10 +16,7 @@
  */
 package io.jenkins.plugins.sonic;
 
-import hudson.AbortException;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
+import hudson.*;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -31,7 +28,9 @@ import io.jenkins.plugins.sonic.bean.ParamBean;
 import io.jenkins.plugins.sonic.bean.Project;
 import io.jenkins.plugins.sonic.utils.HttpUtils;
 import io.jenkins.plugins.sonic.utils.Logging;
+import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
+import org.jetbrains.annotations.NotNull;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -46,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author yaming116, Eason
  */
-public class UploadBuilder extends Builder {
+public class UploadBuilder extends Builder implements SimpleBuildStep {
     private static final Logger LOGGER = Logger.getLogger(UploadBuilder.class.getName());
     private final Secret apiKey;
     private final String scanDir;
@@ -85,11 +84,21 @@ public class UploadBuilder extends Builder {
         return projectId;
     }
 
+    @Override
+    public void perform(@NotNull Run<?, ?> run, @NotNull FilePath workspace, @NotNull EnvVars env, @NotNull Launcher launcher, @NotNull TaskListener listener) throws InterruptedException, IOException {
+        boolean status = build(run, workspace, launcher, listener);
+        run.setResult(status ? Result.SUCCESS : Result.FAILURE);
+        if (!status) throw new InterruptedException("upload fail");
+    }
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        // delegate to the overloaded version defined in SimpleBuildStep
-        FilePath workspace = build.getWorkspace();
+
+        return build(build, build.getWorkspace(), launcher, listener);
+    }
+
+    private boolean build(@NotNull Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws IOException, InterruptedException {
+
         if (workspace == null) {
             throw new AbortException("no workspace for " + build);
         }

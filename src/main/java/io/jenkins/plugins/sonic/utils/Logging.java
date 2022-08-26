@@ -16,21 +16,21 @@
  */
 package io.jenkins.plugins.sonic.utils;
 
-import hudson.model.BuildListener;
+import hudson.model.TaskListener;
 
 public class Logging {
     private static final String TAG = "Sonic: ";
 
 
-    public static void logging(BuildListener listener, String message) {
+    public static void logging(TaskListener listener, String message) {
         listener.getLogger().println(TAG + message);
     }
 
-    public static void printHeader(BuildListener listener) {
+    public static void printHeader(TaskListener listener) {
         listener.getLogger().println("======================== Sonic CI Helper =========================");
     }
 
-    public static void printTail(BuildListener listener) {
+    public static void printTail(TaskListener listener) {
         listener.getLogger().println(TAG + "Bye!");
         listener.getLogger().println("==================================================================");
     }
