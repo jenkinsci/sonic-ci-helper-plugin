@@ -86,18 +86,18 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(@NotNull Run<?, ?> run, @NotNull FilePath workspace, @NotNull EnvVars env, @NotNull Launcher launcher, @NotNull TaskListener listener) throws InterruptedException, IOException {
-        boolean status = build(run, workspace, launcher, listener);
+        boolean status = build(run, workspace, env, listener);
+
         run.setResult(status ? Result.SUCCESS : Result.FAILURE);
         if (!status) throw new InterruptedException("upload fail");
     }
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-
-        return build(build, build.getWorkspace(), launcher, listener);
+        return build(build, build.getWorkspace(), build.getEnvironment(listener), listener);
     }
 
-    private boolean build(@NotNull Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws IOException, InterruptedException {
+    private boolean build(@NotNull Run<?, ?> build, FilePath workspace, EnvVars env, TaskListener listener) throws IOException, InterruptedException {
 
         if (workspace == null) {
             throw new AbortException("no workspace for " + build);
@@ -112,6 +112,7 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
         paramBean.setScanDir(this.scanDir);
         paramBean.setSuiteId(this.suiteId);
         paramBean.setProjectId(this.projectId);
+        paramBean.setEnv(env);
         Logging.printHeader(listener);
         boolean status = HttpUtils.uploadAction(build, listener, paramBean);
         Logging.printTail(listener);

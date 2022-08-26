@@ -19,6 +19,7 @@ package io.jenkins.plugins.sonic.utils;
 import com.ejlchina.data.TypeRef;
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.gson.GsonMsgConvertor;
+import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.Run;
 import hudson.util.Secret;
@@ -56,9 +57,9 @@ public class HttpUtils {
 
 
     public static boolean uploadAction(Run<?, ?> build, hudson.model.TaskListener listener, ParamBean paramBean) throws IOException, InterruptedException {
-        paramBean.setHost(build.getEnvironment(listener).expand(paramBean.getHost()));
-        paramBean.setApiKey(Secret.fromString(build.getEnvironment(listener).expand(Secret.toString(paramBean.getApiKey()))));
-        paramBean.setScanDir(build.getEnvironment(listener).expand(paramBean.getScanDir()));
+        paramBean.setHost(paramBean.getEnv().expand(paramBean.getHost()));
+        paramBean.setApiKey(Secret.fromString(paramBean.getEnv().expand(Secret.toString(paramBean.getApiKey()))));
+        paramBean.setScanDir(paramBean.getEnv().expand(paramBean.getScanDir()));
 
         if (!StringUtils.hasText(paramBean.getProjectId())) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missProjectId());
@@ -79,7 +80,7 @@ public class HttpUtils {
         if (url == null) {
             return false;
         }
-        String branch = getBranch(build, listener);
+        String branch = getBranch(paramBean.getEnv());
         String buildUrl = getBuildUrl(build, listener);
         savePackageInfo(paramBean, listener, fileName, url, platform(fileName), branch, buildUrl);
         if (StringUtils.hasText(paramBean.getSuiteId())) {
@@ -94,8 +95,8 @@ public class HttpUtils {
         return true;
     }
 
-    private static String getBranch(Run<?, ?> build, hudson.model.TaskListener listener) throws IOException, InterruptedException {
-        String branch = build.getEnvironment(listener).expand(BRANCH);
+    private static String getBranch(EnvVars env) throws IOException, InterruptedException {
+        String branch = env.expand(BRANCH);
 
         if (BRANCH.equals(branch)) {
             return "unknown";
