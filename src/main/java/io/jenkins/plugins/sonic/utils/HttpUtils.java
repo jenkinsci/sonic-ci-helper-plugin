@@ -174,6 +174,7 @@ public class HttpUtils {
             @Override
             public void writeTo(BufferedSink bufferedSink) throws IOException {
                 try {
+                    if (bufferedSink == null || filePath == null) return;
                     try (Source source = Okio.source(filePath.read())) {
                         bufferedSink.writeAll(source);
                     }
