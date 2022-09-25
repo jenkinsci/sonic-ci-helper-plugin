@@ -187,7 +187,9 @@ public class HttpUtils {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    inputStream.close();
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
                 }
             }
         });
