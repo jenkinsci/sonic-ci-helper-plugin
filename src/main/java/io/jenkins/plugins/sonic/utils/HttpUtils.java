@@ -35,7 +35,6 @@ import okio.Okio;
 import okio.Source;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -157,7 +156,6 @@ public class HttpUtils {
                 return -1;
             }
 
-            @Nullable
             @Override
             public MediaType contentType() {
                 return MediaType.parse("application/octet-stream");
