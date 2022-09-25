@@ -37,6 +37,7 @@ import okio.Source;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
@@ -155,7 +156,7 @@ public class HttpUtils {
         MultipartBody.Builder builder = new MultipartBody.Builder();
         builder.setType(MultipartBody.FORM);
         builder.addFormDataPart("type", "packageFiles");
-        builder.addFormDataPart("file", filePath.getName(),new RequestBody(){
+        builder.addFormDataPart("file", filePath.getName(), new RequestBody() {
             @Override
             public long contentLength() throws IOException {
                 try {
@@ -173,13 +174,20 @@ public class HttpUtils {
 
             @Override
             public void writeTo(BufferedSink bufferedSink) throws IOException {
+                if (bufferedSink == null || filePath == null) return;
+                InputStream inputStream = null;
                 try {
-                    if (bufferedSink == null || filePath == null) return;
-                    try (Source source = Okio.source(filePath.read())) {
-                        bufferedSink.writeAll(source);
+                    inputStream = filePath.read();
+                    if (inputStream != null) {
+                        Source source = Okio.source(inputStream);
+                        if (source != null) {
+                            bufferedSink.writeAll(source);
+                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } finally {
+                    inputStream.close();
                 }
             }
         });
@@ -273,7 +281,7 @@ public class HttpUtils {
         FilePath dir = null;
         if (StringUtils.hasText(scandir)) {
             dir = new FilePath(workspace, scandir);
-        }else {
+        } else {
             dir = workspace;
         }
         Logging.logging(listener, Messages.UploadBuilder_Scan_dir() + dir);
