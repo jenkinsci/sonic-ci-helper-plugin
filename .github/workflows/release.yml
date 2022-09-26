@@ -1,0 +1,40 @@
+name: release to github
+
+on:
+  push:
+    tags:
+      - "sonic*"
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          generate_release_notes: true
+      - name: package
+        run: mvn hpi:hpi
+      - name: Upload To Github Release
+        uses: xresloader/upload-to-github-release@v1.3.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: target/sonic-ci-helper.hpi
+          tag_name: ${{ steps.previoustag.outputs.tag }}
+          update_latest_release: true
+          draft: false
