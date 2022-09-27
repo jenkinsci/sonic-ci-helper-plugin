@@ -18,7 +18,7 @@ jobs:
         id: previoustag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3.5.1
         with:
           java-version: '17'
           distribution: 'temurin'
