@@ -51,6 +51,7 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
     private final String scanDir;
     private String suiteId;
     private String projectId;
+    private String wildcard;
 
     @DataBoundConstructor
     public UploadBuilder(String apiKey, String scanDir) {
@@ -68,6 +69,11 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
         this.suiteId = suiteId;
     }
 
+    @DataBoundSetter
+    public void setWildcard(String wildcard) {
+        this.wildcard = wildcard;
+    }
+
     public Secret getApiKey() {
         return apiKey;
     }
@@ -82,6 +88,10 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
 
     public String getProjectId() {
         return projectId;
+    }
+
+    public String getWildcard() {
+        return wildcard;
     }
 
     @Override
@@ -112,6 +122,7 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
         paramBean.setScanDir(this.scanDir);
         paramBean.setSuiteId(this.suiteId);
         paramBean.setProjectId(this.projectId);
+        paramBean.setWildcard(this.wildcard);
         paramBean.setEnv(env);
         Logging.printHeader(listener);
         boolean status = HttpUtils.uploadAction(build, listener, paramBean);

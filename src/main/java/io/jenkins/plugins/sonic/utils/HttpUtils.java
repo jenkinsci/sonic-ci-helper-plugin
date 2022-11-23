@@ -47,6 +47,7 @@ public class HttpUtils {
     private static final String PACKAGE_URL = "/server/api/controller/packages";
     private static final String RUN_SUITE_URL = "/server/api/controller/testSuites/runSuite";
     private static final String SonicToken = "SonicToken";
+    private static final String DEFAULT_WILDCARD = "**/*.apk,**/*.ipa";
     private static final String BRANCH = "${GIT_BRANCH}";
     private static final String BUILD_URL = "${BUILD_URL}";
     private static final HTTP http = HTTP.builder()
@@ -65,7 +66,7 @@ public class HttpUtils {
             return false;
         }
 
-        FilePath path = findFile(paramBean.getWorkspace(), paramBean.getScanDir(), listener);
+        FilePath path = findFile(paramBean.getWorkspace(), paramBean.getScanDir(), paramBean.getWildcard(), listener);
         if (null == path) {
             Logging.logging(listener, Messages.UploadBuilder_Http_error_missFile());
             return false;
@@ -259,7 +260,7 @@ public class HttpUtils {
     }
 
 
-    public static FilePath findFile(FilePath workspace, String scandir, hudson.model.TaskListener listener) {
+    public static FilePath findFile(FilePath workspace, String scandir,String wildcard, hudson.model.TaskListener listener) {
         FilePath dir = null;
         if (StringUtils.hasText(scandir)) {
             dir = new FilePath(workspace, scandir);
@@ -273,8 +274,10 @@ public class HttpUtils {
                 Logging.logging(listener, Messages.UploadBuilder_Scan_error());
                 return null;
             }
-
-            uploadFiles = dir.list("**/*.apk,**/*.ipa");
+            if (!StringUtils.hasText(wildcard)) {
+                wildcard = DEFAULT_WILDCARD;
+            }
+            uploadFiles = dir.list(wildcard);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
