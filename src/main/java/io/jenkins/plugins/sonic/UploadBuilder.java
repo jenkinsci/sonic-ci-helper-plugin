@@ -28,6 +28,7 @@ import io.jenkins.plugins.sonic.bean.ParamBean;
 import io.jenkins.plugins.sonic.bean.Project;
 import io.jenkins.plugins.sonic.utils.HttpUtils;
 import io.jenkins.plugins.sonic.utils.Logging;
+import io.jenkins.plugins.sonic.utils.SonicUtils;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +52,7 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
     private final String scanDir;
     private String suiteId;
     private String projectId;
+    private String wildcard;
 
     @DataBoundConstructor
     public UploadBuilder(String apiKey, String scanDir) {
@@ -68,6 +70,11 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
         this.suiteId = suiteId;
     }
 
+    @DataBoundSetter
+    public void setWildcard(String wildcard) {
+        this.wildcard = wildcard;
+    }
+
     public Secret getApiKey() {
         return apiKey;
     }
@@ -82,6 +89,10 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
 
     public String getProjectId() {
         return projectId;
+    }
+
+    public String getWildcard() {
+        return wildcard;
     }
 
     @Override
@@ -103,6 +114,11 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
             throw new AbortException("no workspace for " + build);
         }
 
+        if (SonicUtils.isSkipSonicUpload(env, listener)) {
+            // skip run sonic upload
+            return true;
+        }
+
         String host = SonicGlobalConfiguration.get().getHost();
 
         ParamBean paramBean = new ParamBean();
@@ -112,6 +128,7 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
         paramBean.setScanDir(this.scanDir);
         paramBean.setSuiteId(this.suiteId);
         paramBean.setProjectId(this.projectId);
+        paramBean.setWildcard(this.wildcard);
         paramBean.setEnv(env);
         Logging.printHeader(listener);
         boolean status = HttpUtils.uploadAction(build, listener, paramBean);

@@ -27,6 +27,7 @@ public class ParamBean {
     private String suiteId;
     private String projectId;
     private FilePath workspace;
+    private String wildcard ;
     private EnvVars env;
 
     public ParamBean(){}
@@ -77,6 +78,14 @@ public class ParamBean {
 
     public FilePath getWorkspace() {
         return workspace;
+    }
+
+    public void setWildcard(String wildcard) {
+        this.wildcard = wildcard;
+    }
+
+    public String getWildcard() {
+        return wildcard;
     }
 
     public void setEnv(EnvVars env) {

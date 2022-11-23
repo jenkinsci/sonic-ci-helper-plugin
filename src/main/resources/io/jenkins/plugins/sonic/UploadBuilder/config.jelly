@@ -16,7 +16,11 @@
 
     <f:advanced>
         <f:entry title="${%suiteTitle}" field="suiteId">
-            <f:textbox/>
+               <f:textbox/>
+        </f:entry>
+
+        <f:entry title="${%wildcardTitle}" field="wildcard">
+            <f:textbox default="**/*.apk,**/*.ipa"/>
         </f:entry>
 
     </f:advanced>
