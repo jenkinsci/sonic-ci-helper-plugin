@@ -83,7 +83,7 @@ public class HttpUtils {
         String branch = getBranch(paramBean.getEnv());
         String buildUrl = getBuildUrl(build, listener);
         savePackageInfo(paramBean, listener, fileName, url, platform(fileName), branch, buildUrl);
-        if (StringUtils.hasText(paramBean.getSuiteId())) {
+        if (StringUtils.hasText(paramBean.getSuiteId()) && !SonicUtils.isSkipRunSuite(paramBean.getEnv(), listener)) {
             try {
                 int suiteId = Integer.parseInt(paramBean.getSuiteId());
                 runSuite(paramBean, listener, suiteId);

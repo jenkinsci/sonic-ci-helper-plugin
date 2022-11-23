@@ -28,6 +28,7 @@ import io.jenkins.plugins.sonic.bean.ParamBean;
 import io.jenkins.plugins.sonic.bean.Project;
 import io.jenkins.plugins.sonic.utils.HttpUtils;
 import io.jenkins.plugins.sonic.utils.Logging;
+import io.jenkins.plugins.sonic.utils.SonicUtils;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
 import org.jetbrains.annotations.NotNull;
@@ -111,6 +112,11 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
 
         if (workspace == null) {
             throw new AbortException("no workspace for " + build);
+        }
+
+        if (SonicUtils.isSkipSonicUpload(env, listener)) {
+            // skip run sonic upload
+            return true;
         }
 
         String host = SonicGlobalConfiguration.get().getHost();
