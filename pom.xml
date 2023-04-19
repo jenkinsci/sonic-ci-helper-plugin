@@ -21,7 +21,7 @@
     <licenses>
         <license>
             <name>APACHE2</name>
-            <url>https://github.com/SonicCloudOrg/sonic-ci-jenkins/blob/main/LICENSE</url>
+            <url>https://github.com/jenkinsci/sonic-ci-helper-plugin/blob/main/LICENSE</url>
         </license>
     </licenses>
     <dependencies>
@@ -56,19 +56,18 @@
     <developers>
         <developer>
             <name>SonicCloudOrg</name>
-            <email>https://sonic-cloud.wiki</email>
+            <email>soniccloudorg@163.com</email>
             <timezone>+8</timezone>
         </developer>
     </developers>
 
-    <url>https://sonic-cloud.gitee.io/#/SCH</url>
+    <url>https://sonic-cloud.cn/sch/re-sch.html</url>
 
     <scm>
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-      <tag>sonic-ci-helper-1.0.1</tag>
-  </scm>
+    </scm>
 
     <repositories>
         <repository>
