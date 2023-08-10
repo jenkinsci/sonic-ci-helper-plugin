@@ -247,7 +247,9 @@ public class HttpUtils {
             });
             if (httpResult.getCode() == 2000 || httpResult.getCode() == 3003) {
                 Logging.logging(listener, Messages.UploadBuilder_Suite_success() + httpResult);
-                build.addAction(new PublishEnvVarAction("testResultID", httpResult.getData()));
+                if (httpResult.getData() != null) {
+                    build.addAction(new PublishEnvVarAction("testResultID", httpResult.getData()));
+                }
             } else {
                 Logging.logging(listener, Messages.UploadBuilder_Suite_fail() + httpResult);
             }
