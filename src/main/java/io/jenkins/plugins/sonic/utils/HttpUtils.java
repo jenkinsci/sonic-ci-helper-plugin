@@ -97,7 +97,7 @@ public class HttpUtils {
         if (StringUtils.hasText(paramBean.getSuiteId()) && !SonicUtils.isSkipRunSuite(paramBean.getEnv(), listener)) {
             try {
                 int suiteId = Integer.parseInt(paramBean.getSuiteId());
-                runSuite(paramBean, listener, suiteId);
+                runSuite(build, paramBean, listener, suiteId);
             } catch (Exception e) {
                 Logging.logging(listener, e.getMessage());
                 e.printStackTrace();
@@ -231,7 +231,7 @@ public class HttpUtils {
 
     }
 
-    private static void runSuite(ParamBean paramBean, hudson.model.TaskListener listener, int suiteId) {
+    private static void runSuite(Run<?, ?> build, ParamBean paramBean, hudson.model.TaskListener listener, int suiteId) {
         com.ejlchina.okhttps.HttpResult result = http.sync(paramBean.getHost() + RUN_SUITE_URL)
                 .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()))
                 .addUrlPara("id", suiteId)
@@ -247,6 +247,9 @@ public class HttpUtils {
             });
             if (httpResult.getCode() == 2000 || httpResult.getCode() == 3003) {
                 Logging.logging(listener, Messages.UploadBuilder_Suite_success() + httpResult);
+                if (httpResult.getData() != null) {
+                    build.addAction(new PublishEnvVarAction("testResultID", httpResult.getData()));
+                }
             } else {
                 Logging.logging(listener, Messages.UploadBuilder_Suite_fail() + httpResult);
             }
