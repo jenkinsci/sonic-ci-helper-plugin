@@ -171,7 +171,7 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
             try {
                 HttpResult<List<Project>> httpResult = HttpUtils.listProject();
                 List<Project> list = httpResult == null ? null : httpResult.getData();
-                if (list != null && list.size() > 0) {
+                if (list != null && !list.isEmpty()) {
                     for (Project c : list) {
                         items.add(c.getProjectName(), String.valueOf(c.getId()));
                     }
@@ -187,6 +187,8 @@ public class UploadBuilder extends Builder implements SimpleBuildStep {
             return true;
         }
 
+        @NotNull
+        @Override
         public String getDisplayName() {
             return Messages.UploadBuilder_DescriptorImpl_displayName();
         }

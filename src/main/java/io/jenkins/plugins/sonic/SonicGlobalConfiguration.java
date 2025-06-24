@@ -19,7 +19,6 @@ package io.jenkins.plugins.sonic;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.util.FormValidation;
-import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundSetter;
