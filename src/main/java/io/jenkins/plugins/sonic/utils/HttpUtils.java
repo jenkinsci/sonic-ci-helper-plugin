@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +48,7 @@ public class HttpUtils {
     private static final String PROJECT_URL = "/server/api/controller/projects/list";
     private static final String PACKAGE_URL = "/server/api/controller/packages";
     private static final String RUN_SUITE_URL = "/server/api/controller/testSuites/runSuite";
-    private static final String SonicToken = "SonicToken";
+    private static final String SONIC_TOKEN = "SonicToken";
     private static final String DEFAULT_WILDCARD = "**/*.apk,**/*.ipa";
     private static final String BRANCH = "${GIT_BRANCH}";
     private static final String BUILD_URL = "${BUILD_URL}";
@@ -137,7 +136,7 @@ public class HttpUtils {
 
 
         if (call.getResult().isSuccessful()) {
-            HttpResult<String> httpResult = call.getResult().getBody().toBean(new TypeRef<HttpResult<String>>() {
+            HttpResult<String> httpResult = call.getResult().getBody().toBean(new TypeRef<>() {
                 @Override
                 public Type getType() {
                     return super.getType();
@@ -210,13 +209,13 @@ public class HttpUtils {
         packageBean.setBuildUrl(buildUrl);
 
         com.ejlchina.okhttps.HttpResult result = http.sync(paramBean.getHost() + PACKAGE_URL)
-                .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()))
+                .addHeader(SONIC_TOKEN, Secret.toString(paramBean.getApiKey()))
                 .setBodyPara(packageBean)
                 .put();
 
 
         if (result.isSuccessful()) {
-            HttpResult<String> httpResult = result.getBody().toBean(new TypeRef<HttpResult<String>>() {
+            HttpResult<String> httpResult = result.getBody().toBean(new TypeRef<>() {
                 @Override
                 public Type getType() {
                     return super.getType();
@@ -233,13 +232,13 @@ public class HttpUtils {
 
     private static void runSuite(Run<?, ?> build, ParamBean paramBean, hudson.model.TaskListener listener, int suiteId) {
         com.ejlchina.okhttps.HttpResult result = http.sync(paramBean.getHost() + RUN_SUITE_URL)
-                .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()))
+                .addHeader(SONIC_TOKEN, Secret.toString(paramBean.getApiKey()))
                 .addUrlPara("id", suiteId)
                 .get();
         Logging.logging(listener, Messages.UploadBuilder_Suite_tips() + suiteId);
 
         if (result.isSuccessful()) {
-            HttpResult<String> httpResult = result.getBody().toBean(new TypeRef<HttpResult<String>>() {
+            HttpResult<String> httpResult = result.getBody().toBean(new TypeRef<>() {
                 @Override
                 public Type getType() {
                     return super.getType();
@@ -261,7 +260,7 @@ public class HttpUtils {
 
     private static AHttpTask buildHttp(ParamBean paramBean, String uri) {
         return http.async(paramBean.getHost() + uri)
-                .addHeader(SonicToken, Secret.toString(paramBean.getApiKey()));
+                .addHeader(SONIC_TOKEN, Secret.toString(paramBean.getApiKey()));
     }
 
     public static HttpResult<List<Project>> listProject() {
@@ -273,7 +272,7 @@ public class HttpUtils {
         return http.sync(host + PROJECT_URL)
                 .get()
                 .getBody()
-                .toBean(new TypeRef<HttpResult<List<Project>>>() {
+                .toBean(new TypeRef<>() {
                     @Override
                     public Type getType() {
                         return super.getType();
@@ -301,10 +300,7 @@ public class HttpUtils {
                 wildcard = DEFAULT_WILDCARD;
             }
             uploadFiles = dir.list(wildcard);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return null;
         }
@@ -317,13 +313,10 @@ public class HttpUtils {
         }
 
         List<FilePath> strings = Arrays.asList(uploadFiles);
-        Collections.sort(strings, (o1, o2) -> {
-
+        strings.sort((o1, o2) -> {
             try {
                 return Long.compare(o1.lastModified(), o2.lastModified());
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
             return 0;

@@ -21,8 +21,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.EnvironmentContributingAction;
 import hudson.model.InvisibleAction;
 
-import java.util.Map;
-
 public class PublishEnvVarAction extends InvisibleAction implements EnvironmentContributingAction {
 	/**
 	 * The environment variable key.
@@ -48,6 +46,7 @@ public class PublishEnvVarAction extends InvisibleAction implements EnvironmentC
 	/* (non-Javadoc)
 	 * @see hudson.model.EnvironmentContributingAction#buildEnvVars(hudson.model.AbstractBuild, hudson.EnvVars)
 	 */
+	@Override
 	public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {
 		env.put(key, value);
 	}

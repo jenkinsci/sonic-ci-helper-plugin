@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.4</version>
+        <version>5.17</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
@@ -13,10 +13,8 @@
     <packaging>hpi</packaging>
     <properties>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-        <jenkins.baseline>2.289</jenkins.baseline>
+        <jenkins.baseline>2.479</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
-        <java.level>8</java.level>
-        <plugin.minimumJavaVersion>8</plugin.minimumJavaVersion>
         <hpi.compatibleSinceVersion>2.0.0</hpi.compatibleSinceVersion>
     </properties>
     <name>Sonic CI Helper</name>
@@ -43,7 +41,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>1607.va_c1576527071</version>
+                <version>4924.v6b_eb_a_79a_d9d0</version>
                 <type>pom</type>
             </dependency>
             <dependency>
@@ -51,7 +49,6 @@
                 <artifactId>okhttps</artifactId>
                 <version>3.5.3</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -69,8 +66,8 @@
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <repositories>
         <repository>
@@ -88,14 +85,4 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M6</version>
-            </plugin>
-        </plugins>
-    </build>
 </project>
